@@ -1,0 +1,101 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows-exe:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Locate project folder
+        shell: powershell
+        run: |
+          if (Test-Path "requirements-desktop.txt") {
+            "PROJECT_DIR=$pwd" | Out-File -FilePath $env:GITHUB_ENV -Append
+            Write-Host "Project folder: $pwd"
+          }
+          elseif (Test-Path "acts_service_app\requirements-desktop.txt") {
+            $project = Join-Path $pwd "acts_service_app"
+            "PROJECT_DIR=$project" | Out-File -FilePath $env:GITHUB_ENV -Append
+            Write-Host "Project folder: $project"
+          }
+          else {
+            Write-Host "Repository files:"
+            Get-ChildItem -Force | Format-Table Name,Mode,Length
+            throw "requirements-desktop.txt was not found. Upload the contents of acts_service_app or keep the acts_service_app folder in the repository."
+          }
+
+      - name: Show project files
+        shell: powershell
+        run: |
+          Set-Location "$env:PROJECT_DIR"
+          Get-ChildItem -Force | Format-Table Name,Mode,Length
+          Get-ChildItem -Force static | Format-Table Name,Mode,Length
+          Get-ChildItem -Force templates | Format-Table Name,Mode,Length
+          Get-ChildItem -Force uploads | Format-Table Name,Mode,Length
+
+      - name: Install dependencies
+        shell: powershell
+        run: |
+          Set-Location "$env:PROJECT_DIR"
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-desktop.txt
+
+      - name: Build EXE with PyInstaller
+        shell: powershell
+        run: |
+          Set-Location "$env:PROJECT_DIR"
+          python -m PyInstaller `
+            --noconsole `
+            --onefile `
+            --clean `
+            --name ActsGenerator `
+            --icon "static\favicon.ico" `
+            --add-data "templates;templates" `
+            --add-data "static;static" `
+            --add-data "uploads;uploads" `
+            --hidden-import docx2pdf `
+            --hidden-import pythoncom `
+            --hidden-import pywintypes `
+            --hidden-import win32com `
+            --hidden-import win32com.client `
+            --hidden-import webview.platforms.winforms `
+            --collect-all webview `
+            desktop_app.py
+
+      - name: Prepare release folder
+        shell: powershell
+        run: |
+          Set-Location "$env:PROJECT_DIR"
+          New-Item -ItemType Directory -Path release -Force | Out-Null
+          Copy-Item "dist\ActsGenerator.exe" "release\ActsGenerator.exe" -Force
+          @"
+          ActsGenerator.exe
+
+          Для запуска Python не нужен.
+
+          Требования на компьютере пользователя:
+          1. Microsoft Word — нужен для генерации PDF.
+          2. Microsoft Edge WebView2 Runtime — обычно уже есть в Windows 10/11.
+
+          Если через админку загружен новый шаблон, рядом с exe появится папка uploads.
+          Если нужно перенести приложение вместе с новым шаблоном, переносите ActsGenerator.exe и uploads\template.docx.
+          "@ | Out-File -FilePath "release\README.txt" -Encoding UTF8
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: ActsGenerator-Windows
+          path: |
+            release/*
+            acts_service_app/release/*
+          if-no-files-found: error
