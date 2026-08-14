@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Генерация актов и оферт</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" sizes="any">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-32.png') }}" sizes="32x32">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body data-page="index">
+  <header class="topbar">
+    <div class="topbar-title">
+      <h1>Генерация актов и оферт</h1>
+      <p>Заполните данные и получите ZIP-архив с файлами DOCX и PDF.</p>
+    </div>
+
+    <div class="sponsor-text">Спонсор Каратаева Елена Александровна</div>
+
+    <nav>
+      <a class="library-pill" href="{{ url_for('admin') }}">Библиотека шаблонов</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="card mode-card" id="mode-card">
+      <h2>Режим генерации</h2>
+      <div class="mode-content">
+        <div class="mode-options" id="mode-options">
+          <button type="button" class="mode-option locked" data-mode="act_offer" disabled title="Функционал будет доступен позже">
+            <span class="mode-option-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 13h6M9 17h6M9 9h2"/></svg>
+            </span>
+            <span class="mode-option-text">
+              <strong>Акт + Оферта</strong>
+              <small>Создать акт и оферту</small>
+            </span>
+            <span class="mode-lock" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+          </button>
+          <button type="button" class="mode-option active" data-mode="act_only">
+            <span class="mode-option-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 13h6M9 17h6M9 9h2"/></svg>
+            </span>
+            <span class="mode-option-text">
+              <strong>Только акт</strong>
+              <small>Создать только акт</small>
+            </span>
+          </button>
+          <button type="button" class="mode-option locked" data-mode="offer_only" disabled title="Функционал будет доступен позже">
+            <span class="mode-option-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 13h6M9 17h6M9 9h2"/></svg>
+            </span>
+            <span class="mode-option-text">
+              <strong>Только оферта</strong>
+              <small>Создать только оферту</small>
+            </span>
+            <span class="mode-lock" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+          </button>
+        </div>
+
+        <div class="mode-actions">
+          <button type="button" class="btn btn-primary generate-btn" id="generate-btn">
+            <span class="btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M12 11v6M9 14h6"/></svg>
+            </span>
+            Сгенерировать
+          </button>
+          <button type="button" class="btn btn-secondary" id="add-row-btn"><span class="btn-symbol">+</span> Добавить строку</button>
+          <button type="button" class="btn btn-danger" id="clear-btn">
+            <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 10v6M14 10v6"/></svg></span>
+            Очистить всё
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card acts-card">
+      <div class="card-head compact-head">
+        <div class="section-title-wrap">
+          <div class="section-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/>
+              <path d="M14 2v5h5"/>
+              <path d="M9 13h6M9 17h6M9 9h2"/>
+            </svg>
+          </div>
+          <div>
+            <h2>Документ</h2>
+            <p class="muted">Каждая карточка — отдельный документ.</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="empty-hint" id="empty-hint">Строк пока нет. Нажмите «+ Добавить строку», чтобы заполнить первый документ.</p>
+      <div class="acts-list" id="acts-body"></div>
+    </section>
+
+    <section class="card progress-card hidden" id="progress-section">
+      <h2>Прогресс генерации</h2>
+      <div class="progress">
+        <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+      </div>
+      <p class="status" id="progress-status">Запуск генерации...</p>
+      <a class="btn btn-success hidden" id="download-btn" href="#">⬇️ Скачать ZIP</a>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
