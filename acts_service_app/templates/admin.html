@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Библиотека шаблонов</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" sizes="any">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-32.png') }}" sizes="32x32">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body data-page="admin">
+  <header class="topbar">
+    <div>
+      <h1>Библиотека шаблонов</h1>
+      <p>Загрузка нового Word-шаблона для генерации документов.</p>
+    </div>
+    <nav>
+      <a class="nav-link" href="{{ url_for('index') }}">На главную</a>
+    </nav>
+  </header>
+
+  <main class="page narrow">
+    <button type="button" class="test-mode-fixed" id="test-mode-btn">
+      <span class="test-mode-label">Тестовый режим</span>
+    </button>
+
+    <section class="card">
+      <h2>Шаблон акта</h2>
+      <p class="muted">
+        Текущий шаблон:
+        {% if template_exists %}
+          <span class="ok-text">uploads/template.docx найден</span>
+        {% else %}
+          <span class="error-text">uploads/template.docx не найден</span>
+        {% endif %}
+      </p>
+
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="template-file" accept=".docx" hidden>
+        <div class="upload-icon">📄</div>
+        <strong>Нажмите или перетащите сюда .docx файл</strong>
+        <span id="selected-file-name">Файл не выбран</span>
+      </div>
+
+      <div class="bottom-actions left">
+        <button type="button" class="btn btn-primary" id="upload-btn">⬆️ Загрузить шаблон</button>
+      </div>
+
+      <p class="status" id="upload-status"></p>
+    </section>
+
+    <section class="card">
+      <h2>Шаблон оферты</h2>
+      <p class="muted">
+        Текущий шаблон:
+        {% if template_offer_exists %}
+          <span class="ok-text">uploads/template_offer.docx найден</span>
+        {% else %}
+          <span class="error-text">uploads/template_offer.docx не найден</span>
+        {% endif %}
+      </p>
+
+      <div class="upload-zone" id="upload-zone-offer">
+        <input type="file" id="template-file-offer" accept=".docx" hidden>
+        <div class="upload-icon">📄</div>
+        <strong>Нажмите или перетащите сюда .docx файл</strong>
+        <span id="selected-file-name-offer">Файл не выбран</span>
+      </div>
+
+      <div class="bottom-actions left">
+        <button type="button" class="btn btn-primary" id="upload-btn-offer">⬆️ Загрузить шаблон</button>
+      </div>
+
+      <p class="status" id="upload-status-offer"></p>
+    </section>
+
+    <section class="card">
+      <h2>Поддерживаемые метки</h2>
+      <p class="muted">Добавьте эти метки в Word-шаблон в формате <code>{{ '{{FIO}}' }}</code>.</p>
+      <p class="muted" style="margin-top:16px;">Метки акта:</p>
+      <div class="tags-grid">
+        <code>{{ '{{FIO}}' }}</code>
+        <code>{{ '{{PASSPORT}}' }}</code>
+        <code>{{ '{{INN_EXEC}}' }}</code>
+        <code>{{ '{{ADDRESS_EXEC}}' }}</code>
+        <code>{{ '{{ORG_NAME}}' }}</code>
+        <code>{{ '{{INN_ORG}}' }}</code>
+        <code>{{ '{{ADDRESS_ORG}}' }}</code>
+        <code>{{ '{{OWNER_FIO}}' }}</code>
+        <code>{{ '{{PLACE}}' }}</code>
+        <code>{{ '{{SERVICES}}' }}</code>
+        <code>{{ '{{DATE}}' }}</code>
+        <code>{{ '{{VOLUME}}' }}</code>
+        <code>{{ '{{PRICE}}' }}</code>
+        <code>{{ '{{SIGN_DATETIME}}' }}</code>
+        <code>{{ '{{VALID_FROM}}' }}</code>
+        <code>{{ '{{VALID_TO}}' }}</code>
+        <code>{{ '{{CERT_ORG}}' }}</code>
+        <code>{{ '{{CERT_EXEC}}' }}</code>
+        <code>{{ '{{ACT_NUMBER}}' }}</code>
+      </div>
+      <p class="muted" style="margin-top:18px;">Метки оферты:</p>
+      <div class="tags-grid">
+        <code>{{ '{{OFFER_SENT_DATE}}' }}</code>
+        <code>{{ '{{EXEC_PHONE}}' }}</code>
+        <code>{{ '{{EXEC_EMAIL}}' }}</code>
+        <code>{{ '{{EXEC_ACCBANK}}' }}</code>
+        <code>{{ '{{SIGN_DATETIMEOFF}}' }}</code>
+        <code>{{ '{{CERT_ORGOFF}}' }}</code>
+        <code>{{ '{{CERT_ORGOFF_ORG}}' }}</code>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
